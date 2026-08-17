@@ -1,116 +1,88 @@
-<p align="center">
-    <img src="release/img/icon.png" width="200">
-</p>
+# PrettyZoo（macOS 本地构建版）
 
+PrettyZoo 是一款基于 JavaFX 与 Apache Curator 的 ZooKeeper 图形化管理工具。本仓库是 [vran-dev/PrettyZoo](https://github.com/vran-dev/PrettyZoo)（Apache License 2.0，已归档）的 fork，在 2.1.1 版本基础上做了 macOS（Apple Silicon）兼容性修复与构建工具链升级，可直接在本机编译、打包并运行。
 
-![release-version](https://img.shields.io/github/v/release/vran-dev/prettyZoo?include_prereleases&style=for-the-badge) ![downloads](https://img.shields.io/github/downloads/vran-dev/PrettyZoo/total?style=for-the-badge) ![language](https://img.shields.io/github/languages/top/vran-dev/PrettyZoo?style=for-the-badge) ![licence](https://img.shields.io/github/license/vran-dev/PrettyZoo?style=for-the-badge) ![stars](https://img.shields.io/github/stars/vran-dev/PrettyZoo?style=for-the-badge)
+## 功能特性
 
-#  Announce
+- 多 ZooKeeper 服务器管理
+- 节点实时同步，支持创建 / 搜索 / 更新 / 删除
+- ACL 支持、SSH 隧道
+- 配置导入 / 导出
+- 内置终端操作
+- JSON / XML / Properties 数据格式化与高亮
+- 断线自动重连
 
-Hello PrettyZoo users.
+## 与上游的差异
 
-Since the first version was released on September 30, 2019, almost 4 years have passed. I would like to take this opportunity to express my deepest gratitude to each and every one of you users for being with and supporting this project throughout this time.
+全部改动见 [MODIFICATIONS.md](./MODIFICATIONS.md)，主要包括：
 
-However, due to time and energy constraints, I have had to decide to stop maintaining the project. This is a difficult decision, but I believe it is the best choice for the current situation, and such limitations prevent me from continuing to fully support and update the project.
+- JavaFX 18.0.2 → 21.0.12（修复 macOS 14+ 启动即崩溃）
+- jlink 合并模块显式声明全部所需模块（修复“连接一直转圈、无任何报错”的问题）
+- 恢复 SLF4J / log4j2 日志输出（打包后日志不再丢失）
+- macOS 跳过 AWT Taskbar 调用（避免受限会话中原生 abort）
+- 构建工具链：Gradle 8.14.3 + JDK 21 编译（字节码目标 17），Lombok 1.18.46
+- 新增连接链路诊断日志（`~/.prettyZoo/connect-debug.log`）
 
-Over the years, we have seen the project grow and develop together. I value the feedback and suggestions that every user has given us, and your support is what keeps me going. However, I have to be honest and face the reality that I can no longer guarantee that the project will be continuously updated and maintained.
+## 系统要求
 
-Although I will no longer be maintaining the project, I hope that this open source project will continue to bring value to all of you. After the project is archived, you can still develop and iterate on the project by forking it, and interested developers and users are encouraged to develop and contribute in their own way, so that the project can continue in another form of interest.
+- macOS（Apple Silicon / arm64 已验证）
+- 无需安装 Java：应用自带 JDK 21 运行时
 
-Thanks again to everyone for their support and understanding, and apologies to anyone who had expectations for the project!
+## 安装与运行
 
-2024-01-09 22:15 by vran
+1. 获取 `PrettyZoo-2.1.1-mac-arm64.zip`（见 Releases 或自行构建）；
+2. 解压后把 `PrettyZoo.app` 拖入「应用程序」，或直接双击运行；
+3. 若 macOS 提示无法验证开发者 / 已损坏：
 
+   ```bash
+   xattr -cr "/Applications/PrettyZoo.app"
+   ```
 
-# Language
+   然后右键（或按住 Control 点击）→ 打开。
 
-English |  [中文](README_CN.md)
+### 数据与日志位置
 
-# What
-
-[PrettyZoo](https://github.com/vran-dev/PrettyZoo) is a GUI for [Zookeeper](https://zookeeper.apache.org/) created by
-JavaFX and Apache Curator Framework.
-
-You can download and install at [Release](https://github.com/vran-dev/PrettyZoo/releases), support
-
-- Windows (msi)
-- Mac (dmg)
-- Linux (rpm & deb)
-
-## If you see PrettyZoo is damaged  in Mac
-
-you can see the solution in [issue-219](https://github.com/vran-dev/PrettyZoo/issues/219)
-
-1. run the follow command
-
-```shell
-sudo spctl --master-disable
+```text
+~/.prettyZoo/prettyZoo.cfg             # 服务器连接配置
+~/.prettyZoo/log/prettyZoo.log         # 应用与 Curator 日志
+~/.prettyZoo/connect-debug.log         # 连接链路诊断日志
 ```
 
-2. open System Preferences->Security & Privacy, select **anywhere**
-3. run the follow command
+## 从源码构建
 
-```shell
-xattr -rc /Applications/prettyZoo.app
+环境要求：JDK 21（Temurin 21.0.12 已验证）、可访问网络（首次构建需下载依赖）。
+
+```bash
+git clone https://github.com/Shawnten49/PrettyZoo.git
+cd PrettyZoo
+
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# 生成 app bundle：app/build/jpackage/prettyZoo.app
+./gradlew app:jpackageImage --no-daemon -x test
+
+# 生成 dmg 安装包（需在可挂载磁盘镜像的环境中执行）
+./gradlew app:jpackage
 ```
 
-4. Enjoy it
+字节码目标保持 17 是为了兼容 beryx jlink 打包插件 2.26.0（不影响使用 JDK 21 编译，内置运行时仍由 JDK 21 的 jlink 生成），详见 [MODIFICATIONS.md](./MODIFICATIONS.md)。
 
-# TODO
+## 常见问题
 
-1.
-    - [x] Support i18n (V1.9.0+)
-2.
-    - [ ] terminal highlight
-3.
-    - [x] global font size change (v1.6.0+)
-4.
-    - [x] node data highlight (V1.7.0+)
-5.
-    - [x] migration UI library to   [Jfoenix](https://github.com/sshahine/JFoenix) ( V1.8.0+)
-6.
-    - [ ] zookeeper monitor
-7.
-    - [x] log dashboard (v1.9.3)
+**连接 ZooKeeper 一直转圈、无任何报错**
 
-# Feature
+该问题已在本 fork 修复，根因是 jlink 合并模块缺少 `javafx.*` / `java.*` 模块声明，导致连接前加载节点视图 FXML 时抛 `IllegalAccessError`。若仍出现异常，请查看：
 
-1. Multi zookeeper server manage
-2. Support real-time node synchronize
-3. Support ACL
-4. Support SSH tunnel
-5. Support config export / import
-6. Support node create / search / update / delete
-7. Support terminal operation
-8. Support **JSON** / **XML** data pretty format
-9. Support node data hightlight ( Json / Xml / Properties )
-10. Support reconnet zookeeper automatic
+```text
+~/.prettyZoo/connect-debug.log
+~/.prettyZoo/log/prettyZoo.log
+```
 
-## Build
+**应用打不开 / 提示已损坏**
 
-See wiki: [build yourself](https://github.com/vran-dev/PrettyZoo/wiki/build-yourself)
+执行安装章节中的 `xattr -cr` 命令后重新打开。
 
-# Sponsor
+## 许可证
 
-By wechat sponsor code
-
-<img src="release/img/sponsor.jpg" width="250px"/>
-
-# Show
-
-![new-ui.gif](https://s2.loli.net/2022/11/20/hIwX7MQDSbVqk52.gif)
-
-![dark.gif](https://s2.loli.net/2022/11/20/8Yh6TjcfU5Fzy7b.gif)
-
-![timeout.gif](https://s2.loli.net/2022/11/20/CTFNVoWAUalKIzk.gif)
-
-## Thanks
-
-- [ZooKeeper GUI 客户端](http://vip.iocoder.cn/Zookeeper/PrettyZoo/)  by 「芋道源码」
-
-- [PrettyZoo, 颜值与功能双在线的 Zookeeper 可视化工具](https://mp.weixin.qq.com/s/TkFirILto_moEv_kjBBPFw)
-
-# Supported by
-
-[Jetbrains](https://www.jetbrains.com/)
-![https://www.jetbrains.com/](release/img/jetbrains.svg)
+Apache License 2.0。本仓库保留上游 `LICENSE` 与版权声明，全部改动见 [MODIFICATIONS.md](./MODIFICATIONS.md)。本项目为社区维护版本，并非官方发布。
