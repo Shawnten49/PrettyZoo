@@ -76,10 +76,43 @@ public class PrettyZooFacade {
                                            List<ZookeeperNodeListener> nodeListeners,
                                            List<ServerListener> serverListeners) {
         return CompletableFuture.runAsync(() -> {
-            var serverConfig = configurationDomainService.getById(id).orElseThrow();
-            zookeeperDomainService.connect(serverConfig, nodeListeners, serverListeners);
-            configurationDomainService.incrementConnectTimes(id);
+            debug("connect task started, id=" + id + ", thread=" + Thread.currentThread().getName());
+            try {
+                var serverConfig = configurationDomainService.getById(id).orElseThrow();
+                debug("config loaded: " + serverConfig.getConnectionTo());
+                zookeeperDomainService.connect(serverConfig, nodeListeners, serverListeners);
+                debug("domain connect returned");
+                configurationDomainService.incrementConnectTimes(id);
+                debug("increment done");
+            } catch (Throwable t) {
+                debug("connect FAILED: " + t);
+                t.printStackTrace(debugPrintWriter());
+                throw t;
+            }
         });
+    }
+
+    private static void debug(String msg) {
+        try {
+            var f = new java.io.File(
+                    System.getProperty("user.home") + "/.prettyZoo/connect-debug.log");
+            f.getParentFile().mkdirs();
+            var fw = new java.io.FileWriter(f, true);
+            fw.write(new java.util.Date() + " [" + Thread.currentThread().getName() + "] " + msg + "\n");
+            fw.close();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static java.io.PrintWriter debugPrintWriter() {
+        try {
+            var f = new java.io.File(
+                    System.getProperty("user.home") + "/.prettyZoo/connect-debug.log");
+            f.getParentFile().mkdirs();
+            return new java.io.PrintWriter(new java.io.FileWriter(f, true));
+        } catch (Exception e) {
+            return new java.io.PrintWriter(new java.io.StringWriter());
+        }
     }
 
     public void disconnect(String id) {

@@ -9,7 +9,9 @@ plugins {
 checkstyleMain.source = "src/main/java"
 
 javafx {
-    version = "18.0.2"
+    // 升级到 21 LTS：18.0.2 在 macOS 14+ 上启动即崩溃
+    // （-[NSWindow _setFrameCommon:display:fromServer:] 的已知 bug，官方在 17.0.10+ / 21+ 修复）
+    version = "21.0.12"
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
 }
 
@@ -45,6 +47,51 @@ jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     addExtraDependencies("javafx")
     forceMerge("jackson", "log4j-api")
+    mergedModule {
+        // slf4j 2.x 的 log4j-slf4j2-impl 在合并模块中 provides SLF4JServiceProvider，
+        // 但插件生成的 module-info 缺少 requires org.slf4j，导致 javac 报“程序包 org.slf4j.spi 不可见”。
+        requires 'org.slf4j'
+        // 指定 mergedModule 配置后，插件不再自动补全 jdeps 分析出的 requires，
+        // 以下 JDK 模块必须显式声明，否则运行时会抛 IllegalAccessError / NoClassDefFoundError。
+        requires 'java.logging'
+        requires 'java.security.sasl'
+        requires 'java.naming'
+        requires 'java.management'
+        requires 'java.prefs'
+        requires 'java.rmi'
+        requires 'java.sql'
+        requires 'java.xml'
+        requires 'java.desktop'
+        requires 'java.security.jgss'
+        requires 'jdk.unsupported'
+        requires 'java.scripting'
+        requires 'java.compiler'
+        requires 'java.net.http'
+        // 合并模块里包含 RichTextFX / Flowless / jfoenix 等依赖，它们的类继承 javafx 控件，
+        // 必须显式 requires javafx 模块，否则加载节点视图 FXML 时抛 IllegalAccessError，
+        // 连接任务根本没机会启动（表现为一直转圈、无报错）。
+        requires 'javafx.base'
+        requires 'javafx.graphics'
+        requires 'javafx.controls'
+        requires 'javafx.fxml'
+        // 把 log4j-slf4j2-impl 的 provider 重新声明进合并模块，
+        // 否则 jlink 后 SLF4J 找不到 provider，应用和 Curator 的日志全部丢失。
+        provides('org.slf4j.spi.SLF4JServiceProvider')
+                .with('org.apache.logging.slf4j.SLF4JServiceProvider')
+        uses 'org.apache.logging.log4j.spi.Provider'
+        uses 'org.apache.logging.log4j.core.util.ContextDataProvider'
+        uses 'org.apache.logging.log4j.util.PropertySource'
+        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
+        provides('org.apache.logging.log4j.spi.Provider')
+                .with('org.apache.logging.log4j.core.impl.Log4jProvider')
+        provides('org.apache.logging.log4j.core.util.ContextDataProvider')
+                .with('org.apache.logging.log4j.core.impl.ThreadContextDataProvider')
+        provides('org.apache.logging.log4j.util.PropertySource')
+                .with('org.apache.logging.log4j.util.EnvironmentPropertySource',
+                        'org.apache.logging.log4j.util.SystemPropertiesPropertySource')
+        provides('org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory')
+                .with('org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory')
+    }
     launcher {
         name = 'prettyZoo'
         jvmArgs = runArgsValue

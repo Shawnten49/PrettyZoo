@@ -30,6 +30,11 @@ public class PrettyZooApplication extends Application {
     }
 
     private static void initIconImage() {
+        if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
+            // macOS 上 Dock 图标已由 bundle 内的 .icns 提供；
+            // Taskbar.getTaskbar() 在受限/无图形会话中会触发 AWT 原生 abort，这里直接跳过
+            return;
+        }
         getIconStream()
                 .ifPresent(inputStream -> {
                     try {

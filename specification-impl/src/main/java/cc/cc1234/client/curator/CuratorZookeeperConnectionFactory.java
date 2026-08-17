@@ -43,7 +43,9 @@ public class CuratorZookeeperConnectionFactory implements ZookeeperConnectionFac
 
     @Override
     public ZookeeperConnection<CuratorFramework> createAsync(ZookeeperParams params, List<ServerListener> listener) {
+        debug("factory createAsync url=" + params.getUrl());
         final CuratorFramework client = curatorFramework(params);
+        debug("client built, adding listeners");
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
@@ -74,17 +76,38 @@ public class CuratorZookeeperConnectionFactory implements ZookeeperConnectionFac
             }
         });
 
+        debug("client.start() called");
         client.start();
+        debug("start returned, blockUntilConnected...");
         try {
-            if (!client.blockUntilConnected(3, TimeUnit.SECONDS)) {
+            boolean connected = client.blockUntilConnected(3, TimeUnit.SECONDS);
+            debug("blockUntilConnected=" + connected
+                    + " isConnected=" + client.getZookeeperClient().isConnected());
+            if (!connected) {
                 client.close();
                 throw new IllegalStateException("connect " + params.getUrl() + " failed");
             }
         } catch (InterruptedException e) {
             client.close();
             throw new IllegalStateException("connect " + params.getUrl() + " failed", e);
+        } catch (Throwable t) {
+            debug("factory FAILED: " + t);
+            throw t;
         }
+        debug("factory createAsync done");
         return new CuratorZookeeperConnection(params.getId(), client);
+    }
+
+    private static void debug(String msg) {
+        try {
+            var f = new java.io.File(
+                    System.getProperty("user.home") + "/.prettyZoo/connect-debug.log");
+            f.getParentFile().mkdirs();
+            var fw = new java.io.FileWriter(f, true);
+            fw.write(new java.util.Date() + " [" + Thread.currentThread().getName() + "] " + msg + "\n");
+            fw.close();
+        } catch (Exception ignored) {
+        }
     }
 
     private CuratorFramework curatorFramework(ZookeeperParams params) {
