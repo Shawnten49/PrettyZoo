@@ -97,11 +97,6 @@ public class MainViewController {
     @FXML
     private Button prettyZooLink;
 
-    @FXML
-    private Button sponsorButton;
-
-    @FXML
-    private Label wechatSponsorLabel;
 
     private ServerViewController serverViewController = FXMLs.getController("fxml/ServerView.fxml");
 
@@ -129,20 +124,10 @@ public class MainViewController {
         initMenuAction();
         serverViewController.setOnClose(() -> this.serverListView.selectionModelProperty().get().clearSelection());
         prettyZooLink.setOnMouseClicked(e -> HostServiceContext.get()
-            .showDocument("https://github.com/vran-dev/PrettyZoo"));
-        initFontChangeButton();
-        initSponsorButton();
+            .showDocument("https://github.com/Shawnten49/PrettyZoo"));
+        initFontChangeButton();
     }
 
-    private void initSponsorButton() {
-        sponsorButton.setOnMouseEntered(e -> {
-            wechatSponsorLabel.setVisible(true);
-        });
-
-        sponsorButton.setOnMouseExited(e -> {
-            wechatSponsorLabel.setVisible(false);
-        });
-    }
 
     public StackPane getRootStackPane() {
         return rootStackPane;

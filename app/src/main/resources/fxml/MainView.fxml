@@ -140,10 +140,6 @@
                                     <VBox>
                                         <JFXButton styleClass="git-icon" fx:id="prettyZooLink"/>
                                     </VBox>
-                                    <VBox spacing="20">
-                                        <JFXButton styleClass="sponsor-icon" fx:id="sponsorButton"/>
-                                        <Label fx:id="wechatSponsorLabel" styleClass="wechat-sponsor" visible="false"/>
-                                    </VBox>
                                 </HBox>
                             </children>
                             <StackPane.margin>
