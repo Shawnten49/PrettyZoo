@@ -21,7 +21,7 @@ public class VersionChecker {
     public static void hasNewVersion(BiConsumer<String, String> newVersionAction,
                                      Runnable noUpdateAction,
                                      Consumer<Throwable> exceptionally) {
-        URI uri = URI.create("https://api.github.com/repos/vran-dev/PrettyZoo/releases/latest");
+        URI uri = URI.create("https://api.github.com/repos/Shawnten49/PrettyZoo/releases/latest");
         var request = HttpRequest.newBuilder(uri)
             .build();
         var client = HttpClient.newHttpClient();
@@ -71,6 +71,8 @@ public class VersionChecker {
         if (arr.length == 2) {
             r = arr[1];
         }
+        // 兼容带后缀的发布标签（如 v2.1.1-mac-arm64）：比较时忽略 "-" 之后的内容
+        r = r.split("-")[0];
 
         final String[] localVersionArr = Version.VERSION.split("\\.");
         final String[] remoteVersionArr = r.split("\\.");

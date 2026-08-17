@@ -19,7 +19,7 @@ public class HostServiceContext {
 
     public static void jumpToReleases() {
         Platform.runLater(() -> {
-            hostServices.showDocument("https://github.com/vran-dev/PrettyZoo/releases");
+            hostServices.showDocument("https://github.com/Shawnten49/PrettyZoo/releases");
         });
     }
 }

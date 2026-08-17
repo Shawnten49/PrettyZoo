@@ -67,6 +67,8 @@ jlink {
         requires 'java.scripting'
         requires 'java.compiler'
         requires 'java.net.http'
+        // 缺少 jdk.crypto.ec 时，内置运行时的 HTTPS 请求会握手失败（SSLHandshakeException: handshake_failure）
+        requires 'jdk.crypto.ec'
         // 合并模块里包含 RichTextFX / Flowless / jfoenix 等依赖，它们的类继承 javafx 控件，
         // 必须显式 requires javafx 模块，否则加载节点视图 FXML 时抛 IllegalAccessError，
         // 连接任务根本没机会启动（表现为一直转圈、无报错）。
