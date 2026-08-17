@@ -17,6 +17,17 @@
     -fx-text-fill: #000;
 }
 
+.config-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.config-title-separator .line {
+    -fx-border-color: null;
+    -fx-background-color: #c8c8c8;
+    -fx-pref-height: 1px;
+}
+
 .button {
     -fx-text-fill: #000;
     -fx-background-color: #FFF;

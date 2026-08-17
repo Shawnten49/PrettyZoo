@@ -46,6 +46,27 @@ jlink 后 SLF4J 找不到 provider，应用与 Curator 的日志全部丢失。�
 
 变更文件：`build.gradle`、`gradlew`、`gradlew.bat`、`gradle/wrapper/*`。
 
+### 7. 首页 GitHub 链接与移除赞赏图标（`MainViewController.java` / `MainView.fxml`）
+
+- GitHub 图标点击改为打开本 fork：https://github.com/Shawnten49/PrettyZoo
+- 移除首页赞赏（微信）图标与二维码 Label
+
+### 8. 更新检查与版本跳转指向本 fork（`VersionChecker.java` / `HostServiceContext.java`）
+
+- 检查更新的 API 改为 `https://api.github.com/repos/Shawnten49/PrettyZoo/releases/latest`
+- 版本比较兼容带后缀的发布标签（如 `v2.1.1-mac-arm64`，比较时忽略 `-` 之后内容）
+- 发现新版本后的跳转页面改为本 fork 的 releases
+
+### 9. HTTPS / TLS 修复（`app/build.gradle`）
+
+jlink 裁剪运行时缺少 `jdk.crypto.ec`（EC 加密提供者），内置运行时请求 HTTPS 会握手失败（`SSLHandshakeException: handshake_failure`）。在 mergedModule 中补充 `requires 'jdk.crypto.ec'`。
+
+### 10. 配置页标题与分割线（`ServerView.fxml` / `ServerViewController.java` / 国际化 / CSS）
+
+- 新增配置时顶部显示国际化标题：新增配置 / New Configuration
+- 选择已有配置时顶部显示该配置的 Alias name
+- 标题加粗、20px、水平居中，下方带适配亮暗主题的分割线
+
 ## 构建方式
 
 ```bash

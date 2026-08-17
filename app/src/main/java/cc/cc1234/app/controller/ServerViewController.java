@@ -24,6 +24,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.AnchorPane;
@@ -132,6 +133,9 @@ public class ServerViewController {
     private Button connectButton;
 
     @FXML
+    private Label configTitleLabel;
+
+    @FXML
     private HBox buttonHBox;
 
     private PrettyZooFacade prettyZooFacade = new PrettyZooFacade();
@@ -182,6 +186,7 @@ public class ServerViewController {
         buttonHBox.getChildren().remove(deleteButton);
         buttonHBox.getChildren().remove(connectButton);
         serverConfiguration.reset();
+        configTitleLabel.setText(ResourceBundleUtils.getContent("server.config.new.title"));
         switchIfNecessary(stackPane);
         zkHost.requestFocus();
     }
@@ -199,6 +204,7 @@ public class ServerViewController {
 
         connectButton.setOnMouseClicked(e -> onConnect(stackPane, config));
         propertyUpdate(config);
+        configTitleLabel.setText(config.getZkAlias());
         showConnectAndSaveButton();
         switchIfNecessary(stackPane);
     }

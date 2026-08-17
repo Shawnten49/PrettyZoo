@@ -22,6 +22,8 @@ PrettyZoo 是一款基于 JavaFX 与 Apache Curator 的 ZooKeeper 图形化管�
 - macOS 跳过 AWT Taskbar 调用（避免受限会话中原生 abort）
 - 构建工具链：Gradle 8.14.3 + JDK 21 编译（字节码目标 17），Lombok 1.18.46
 - 新增连接链路诊断日志（`~/.prettyZoo/connect-debug.log`）
+- 首页 GitHub 图标指向本 fork、移除赞赏图标；检查更新接口与页面同样指向本 fork
+- 配置页顶部显示标题（新增配置 / Alias name）并带分割线
 
 ## 系统要求
 
