@@ -23,6 +23,9 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
 
+    // 使用 JDK 21 编译（工具链），但字节码目标保持 17：
+    // beryx jlink 插件 2.26.0 的模块检查器不支持 class file 65（Java 21）。
+    // 注意：最终 app bundle 内置的运行时仍由 JDK 21 的 jlink 生成。
     sourceCompatibility = 17
     group 'cc.c1234'
     version '2.1.1'
@@ -50,7 +53,7 @@ subprojects {
         sshjVersion = '0.34.0'
         antlr4RuntimeVersion = '4.9.2'
         commonsIoVersion = '2.10.0'
-        lombokVersion = '1.18.22'
+        lombokVersion = '1.18.46'
         mapStructVersion = '1.5.3.Final'
     }
 

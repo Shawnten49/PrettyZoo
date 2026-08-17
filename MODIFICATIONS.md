@@ -38,11 +38,19 @@ jlink 后 SLF4J 找不到 provider，应用与 Curator 的日志全部丢失。�
 
 在连接异步任务与 Curator 建连的关键步骤写入 `~/.prettyZoo/connect-debug.log`，便于排查“连接卡住”类问题。如需纯净版本，删除这两个文件中的 `debug(...)` 调用即可。
 
+### 6. 构建工具链升级
+
+- Gradle wrapper 7.6 → 8.14.3（8.5+ 才支持在 Java 21 上运行）；
+- 使用 JDK 21 编译（`JAVA_HOME` 指向本机 Temurin 21），`sourceCompatibility` 保持 17：beryx jlink 插件 2.26.0 的模块检查器不支持 class file 65（Java 21 字节码）；内置运行时仍由 JDK 21 的 jlink 生成；
+- Lombok 1.18.22 → 1.18.46（1.18.30+ 才支持 JDK 21）。
+
+变更文件：`build.gradle`、`gradlew`、`gradlew.bat`、`gradle/wrapper/*`。
+
 ## 构建方式
 
 ```bash
-# 需要 JDK 17（Gradle 7.6 不支持 Java 21）
-export JAVA_HOME=<jdk17>/Contents/Home
+# 使用本机 JDK 21（Gradle 8.14.3 已支持）
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # 生成 app bundle（macOS arm64）
